@@ -1,0 +1,29 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+div,
+p,
+li,
+ol,
+span,
+a,
+input,
+textarea {
+    font-size: 14px;
+    font-family: 'eafont', 'Hiragino Sans GB', 'Hiragino Sans GB W3',
+        'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+html,
+body,
+#app {
+    height: 100%;
+}
