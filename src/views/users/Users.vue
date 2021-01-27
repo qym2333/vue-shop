@@ -48,8 +48,22 @@
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryData.pagenum" :page-sizes="[5, 10, 15, 20]" :page-size="queryData.pagesize" layout="total, sizes, prev, pager, next" :total="total" :hide-on-single-page="true">
       </el-pagination>
       <!-- 添加用户对话框 -->
-      <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="45%">
-        <span>这是一段信息</span>
+      <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="40%">
+        <!-- model用来记录整个表单的数据 -->
+        <el-form ref="addUserFormRef" :rules="addUserRules" :model="addUserForm" label-width="80px">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="addUserForm.username" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="addUserForm.password" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="addUserForm.email" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="addUserForm.mobile" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
@@ -62,6 +76,25 @@
 <script>
 export default {
   data () {
+    // 邮箱自定义校验规则
+    const checkEmail = (rule, value, cb) => {
+      // rule 当前校验规则
+      // value 当前需要检验的值：输入框的值
+      // cb 回调
+      const reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
+      if (!reg.test(value)) {
+        return cb(new Error('Wrong Format'))
+      }
+      cb()
+    }
+    // 手机号自定义校验规则
+    const checkMobile = (rule, value, cb) => {
+      const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57]|19[89])[0-9]{8}$/
+      if (!reg.test(value)) {
+        return cb(new Error('Wrong Format'))
+      }
+      cb()
+    }
     return {
       queryData: {
         query: '',
@@ -71,7 +104,31 @@ export default {
       usersList: [], // 用户列表
       total: 0, // 数据总数
       // 添加对话框显示
-      addDialogVisible: false
+      addDialogVisible: false,
+      addUserForm: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      },
+      addUserRules: {
+        username: [
+          { required: true, message: 'name', trigger: 'blur' },
+          { min: 2, max: 6, message: '2~6 character', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: 'password', trigger: 'blur' },
+          { min: 6, max: 16, message: '6~16 character', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: 'email', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: 'mobile', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ]
+      }
     }
   },
 

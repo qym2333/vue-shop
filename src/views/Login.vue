@@ -82,7 +82,7 @@ export default {
         ],
         password: [
           { required: true, message: 'password', trigger: 'blur' },
-          { min: 6, max: 16, message: '6~16 characte', trigger: 'blur' }
+          { min: 6, max: 16, message: '6~16 character', trigger: 'blur' }
         ]
       }
     }

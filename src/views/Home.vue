@@ -6,7 +6,7 @@
         <img class="logo2" src="../assets/login-2.png" alt="" :style="isCollapse?'display:block':'display:none'">
       </div>
       <span>后台管理系统</span>
-      <el-button plain @click="onLogout">退出</el-button>
+      <el-button plain @click="onLogout" size="small" class="btn-quit"><i class="el-icon-switch-button"></i></el-button>
     </el-header>
     <el-container>
       <el-aside :width="isCollapse?'64px':'200px' ">
@@ -97,6 +97,11 @@ export default {
     align-items: center;
     // background-color: #0e8bff;
     border-bottom: 2px solid #0e8bff;
+    .btn-quit {
+      i {
+        font-size: 20px;
+      }
+    }
     span {
       padding-left: 60px;
       font-size: 24px;
@@ -119,7 +124,7 @@ export default {
         }
         &.logo2 {
           top: 20px;
-          left: 4px;
+          left: 8px;
           width: 222/4.5px;
           height: 180/4.5px;
           z-index: 9;
