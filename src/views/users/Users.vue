@@ -19,36 +19,38 @@
         </el-col>
         <!-- 添加按钮 -->
         <el-col :span="4">
-          <el-button type="primary" icon="el-icon-plus" plain @click=" addDialogVisible = true"></el-button>
+          <el-button type="primary" icon="el-icon-plus" plain @click="addDialogVisible = true"></el-button>
         </el-col>
       </el-row>
       <!-- 列表区域 -->
       <el-table :data="usersList">
         <el-table-column type="index" label="#"></el-table-column>
-        <el-table-column prop="username" label="用户名" width="100"></el-table-column>
-        <el-table-column prop="email" label="邮箱"></el-table-column>
+        <el-table-column prop="username" label="用户名"></el-table-column>
+        <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
         <el-table-column prop="mobile" label="联系方式"></el-table-column>
-        <el-table-column prop="role_name" label="角色" width="150"></el-table-column>
-        <el-table-column prop="mg_state" label="状态" width="100">
+        <el-table-column prop="role_name" label="角色"></el-table-column>
+        <el-table-column prop="mg_state" label="状态">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.mg_state" @change="handleUserStateChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" min-width="180" fixed="right">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEdit(scope.row)"></el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row)"></el-button>
-            <el-tooltip class="item" effect="light" content="分配角色" placement="top" :enterable="false">
-              <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleUserRoles(scope.row)"></el-button>
-            </el-tooltip>
+            <div class="opt-btn-list">
+              <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUserEdit(scope.row)"></el-button>
+              <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row)"></el-button>
+              <el-tooltip class="item" effect="light" content="分配角色" placement="top" :enterable="false">
+                <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleUserRoles(scope.row)"></el-button>
+              </el-tooltip>
+            </div>
           </template>
         </el-table-column>
       </el-table>
       <!-- 分页区域 -->
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryData.pagenum" :page-sizes="[5, 10, 15, 20]" :page-size="queryData.pagesize" layout="total, sizes, prev, pager, next" :total="total" :hide-on-single-page="true">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryData.pagenum" :page-sizes="[5, 10, 15, 20]" :page-size="queryData.pagesize" layout="total, sizes, prev, pager, next" :total="total">
       </el-pagination>
       <!-- 添加用户对话框 -->
-      <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="40%">
+      <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="40%" @close="$refs.addUserFormRef.resetFields()">
         <!-- model用来记录整个表单的数据 -->
         <el-form ref="addUserFormRef" :rules="addUserRules" :model="addUserForm" label-width="80px">
           <el-form-item label="用户名" prop="username">
@@ -66,7 +68,25 @@
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+          <el-button type="primary" @click="handleUserAdd">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 修改用户对话框 -->
+      <el-dialog :title="editUserForm.username" :visible.sync="editDialogVisible" width="40%" @close="$refs.editUserFormRef.resetFields()">
+        <el-form ref="editUserFormRef" :rules="addUserRules" :model="editUserForm" label-width="80px">
+          <el-form-item label="用户名">
+            <el-input v-model="editUserForm.username" autocomplete="off" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editUserForm.email" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="editUserForm.mobile" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="handleUserEditSave(editUserForm.id)">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -128,6 +148,14 @@ export default {
           { required: true, message: 'mobile', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ]
+      },
+      // 编辑对话框显示
+      editDialogVisible: false,
+      editUserForm: {
+        id: '',
+        username: '',
+        email: '',
+        mobile: ''
       }
     }
   },
@@ -157,10 +185,6 @@ export default {
       this.queryData.pagenum = val
       this.getUsersList()
     },
-    // 编辑用户
-    handleUserEdit (row) {
-      console.log(row)
-    },
     // 删除用户
     handleUserDelete (row) {
       console.log(row)
@@ -178,6 +202,39 @@ export default {
         return this.$message.error(res.meta.msg)
       }
       this.$message.success(res.meta.msg)
+    },
+    // 添加用户
+    handleUserAdd () {
+      this.$refs.addUserFormRef.validate(async flag => {
+        if (flag) {
+          const { data: res } = await this.$axios.post('users', this.addUserForm)
+          if (res.meta.status !== 201) return this.$message.error(res.meta.msg)
+          this.$message.success(res.meta.msg)
+          this.addDialogVisible = false
+        }
+      })
+    },
+    // 编辑用户
+    handleUserEdit (row) {
+      this.editDialogVisible = true
+      const { username, email, mobile } = row
+      this.editUserForm = { id: row.id, username, email, mobile }
+    },
+    // 确认编辑用户
+    handleUserEditSave (id) {
+      this.$refs.editUserFormRef.validate(async flag => {
+        if (flag) {
+          const { data: res } = await this.$axios.put(`users/${id}`, {
+            email: this.editUserForm.email,
+            mobile: this.editUserForm.mobile
+          })
+          console.log(res)
+          if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+          this.$message.success(res.meta.msg)
+          this.editDialogVisible = false
+          this.getUsersList()
+        }
+      })
     }
   }
 }
