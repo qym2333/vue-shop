@@ -13,13 +13,13 @@
       <el-row :gutter="20">
         <!-- 搜索区域 -->
         <el-col :span="8">
-          <el-input placeholder="请输入内容" prefix-icon="el-icon-search">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input v-model="queryData.query" placeholder="请输入内容" prefix-icon="el-icon-search" clearable @clear="getUsersList()" @keypress.native.enter="getUsersList()">
+            <el-button slot="append" icon="el-icon-search" @click="getUsersList()"></el-button>
           </el-input>
         </el-col>
         <!-- 添加按钮 -->
         <el-col :span="4">
-          <el-button type="primary" icon="el-icon-plus" plain></el-button>
+          <el-button type="primary" icon="el-icon-plus" plain @click=" addDialogVisible = true"></el-button>
         </el-col>
       </el-row>
       <!-- 列表区域 -->
@@ -31,15 +31,15 @@
         <el-table-column prop="role_name" label="角色" width="150"></el-table-column>
         <el-table-column prop="mg_state" label="状态" width="100">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.mg_state"></el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="handleUserStateChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)"></el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEdit(scope.row)"></el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row)"></el-button>
             <el-tooltip class="item" effect="light" content="分配角色" placement="top" :enterable="false">
-              <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleRoles(scope.$index, scope.row)"></el-button>
+              <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleUserRoles(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -47,6 +47,14 @@
       <!-- 分页区域 -->
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryData.pagenum" :page-sizes="[5, 10, 15, 20]" :page-size="queryData.pagesize" layout="total, sizes, prev, pager, next" :total="total" :hide-on-single-page="true">
       </el-pagination>
+      <!-- 添加用户对话框 -->
+      <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="45%">
+        <span>这是一段信息</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -61,7 +69,9 @@ export default {
         pagesize: 5
       },
       usersList: [], // 用户列表
-      total: 0 // 数据总数
+      total: 0, // 数据总数
+      // 添加对话框显示
+      addDialogVisible: false
     }
   },
 
@@ -80,19 +90,37 @@ export default {
       this.usersList = res.data.users
       this.total = res.data.total
     },
-    handleEdit (index, row) {
-      console.log(index, row)
-    },
-    handleDelete (index, row) {
-      console.log(index, row)
-    },
+    // 分页操作 改变每页大小
     handleSizeChange (val) {
       this.queryData.pagesize = val
       this.getUsersList()
     },
+    // 改变页码
     handleCurrentChange (val) {
       this.queryData.pagenum = val
       this.getUsersList()
+    },
+    // 编辑用户
+    handleUserEdit (row) {
+      console.log(row)
+    },
+    // 删除用户
+    handleUserDelete (row) {
+      console.log(row)
+    },
+    // 分配用户角色
+    handleUserRoles (row) {
+      console.log(row)
+    },
+    // 修改用户状态
+    async handleUserStateChange (row) {
+      const { id, mg_state: state } = row
+      const { data: res } = await this.$axios.put(`users/${id}/state/${state}`)
+      if (res.meta.status !== 200) {
+        row.mg_state = !row.mg_state
+        return this.$message.error(res.meta.msg)
+      }
+      this.$message.success(res.meta.msg)
     }
   }
 }
