@@ -37,8 +37,11 @@
         <el-table-column label="操作" min-width="180" fixed="right">
           <template slot-scope="scope">
             <div class="opt-btn-list">
+              <!-- 编辑按钮 -->
               <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUserEdit(scope.row)"></el-button>
+              <!-- 删除按钮 -->
               <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row.id)"></el-button>
+              <!-- 分配角色按钮 -->
               <el-tooltip class="item" effect="light" content="分配角色" placement="top" :enterable="false">
                 <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleUserRoles(scope.row)"></el-button>
               </el-tooltip>
@@ -192,7 +195,9 @@ export default {
     // 修改用户状态
     async handleUserStateChange (row) {
       const { id, mg_state: state } = row
-      const { data: res } = await this.$axios.put(`users/${id}/state/${state}`)
+      const { data: res } = await this.$axios.put(`users/${id}/state/${state}`).catch(err => {
+        this.$message.error(err)
+      })
       if (res.meta.status !== 200) {
         row.mg_state = !row.mg_state
         return this.$message.error(res.meta.msg)
@@ -245,9 +250,7 @@ export default {
         if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
         this.$message.success(res.meta.msg)
         this.getUsersList()
-      }).catch(() => {
-        // this.$message.error('err')
-      })
+      }).catch(err => err)
     }
   }
 }
