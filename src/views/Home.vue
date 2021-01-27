@@ -5,7 +5,8 @@
         <img class="logo1" src="../assets/login-1.png" alt="" :style="isCollapse?'display:none':'display:block'">
         <img class="logo2" src="../assets/login-2.png" alt="" :style="isCollapse?'display:block':'display:none'">
       </div>
-      <span>后台管理系统</span>
+      <span>Houtaiguanlixitong</span>
+      <!-- <img src="../assets/head.gif" alt="" style="transform:scale(0.6)"> -->
       <el-button plain @click="onLogout" size="small" class="btn-quit"><i class="el-icon-switch-button"></i></el-button>
     </el-header>
     <el-container>
@@ -52,9 +53,21 @@ export default {
   methods: {
     // 账号退出
     onLogout () {
-      sessionStorage.removeItem('token')
-      this.$router.push('/login')
-      this.$message.success('账号退出……')
+      this.$confirm('这就要走了嘛 ?TAT', '嘤嘤嘤', {
+        confirmButtonText: '说走就走',
+        cancelButtonText: '留下',
+        type: 'warning'
+      })
+        .then(() => {
+          // 点击了确认
+          sessionStorage.removeItem('token')
+          this.$router.push('/login')
+          this.$message.success('账号退出……')
+        })
+        .catch(() => {
+          // 点击了取消
+          console.log('嘻嘻嘻')
+        })
     },
     // 获取菜单内容
     async getMenu () {
@@ -103,7 +116,7 @@ export default {
       }
     }
     span {
-      padding-left: 60px;
+      padding-left: 100px;
       font-size: 24px;
       color: #0e8bff;
       margin-left: 10px;

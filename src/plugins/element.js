@@ -5,6 +5,7 @@ import {
   FormItem,
   Input,
   Message,
+  MessageBox,
   Loading,
   Container,
   Header,
@@ -49,7 +50,9 @@ Vue.use(Switch)
 Vue.use(Tooltip)
 Vue.use(Pagination)
 Vue.use(Dialog)
+// Vue.use(MessageBox)
 
 // 全局消息提示
 // 挂载到vue原型，目的是所用过的组件都可以使用，因为所有的组件继承自vue的原型
 Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm

@@ -38,7 +38,7 @@
           <template slot-scope="scope">
             <div class="opt-btn-list">
               <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUserEdit(scope.row)"></el-button>
-              <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row)"></el-button>
+              <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row.id)"></el-button>
               <el-tooltip class="item" effect="light" content="分配角色" placement="top" :enterable="false">
                 <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleUserRoles(scope.row)"></el-button>
               </el-tooltip>
@@ -86,7 +86,7 @@
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="editDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="handleUserEditSave(editUserForm.id)">确 定</el-button>
+          <el-button type="primary" @click="handleUserEditSave">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -185,10 +185,6 @@ export default {
       this.queryData.pagenum = val
       this.getUsersList()
     },
-    // 删除用户
-    handleUserDelete (row) {
-      console.log(row)
-    },
     // 分配用户角色
     handleUserRoles (row) {
       console.log(row)
@@ -211,29 +207,46 @@ export default {
           if (res.meta.status !== 201) return this.$message.error(res.meta.msg)
           this.$message.success(res.meta.msg)
           this.addDialogVisible = false
+          this.getUsersList()
         }
       })
     },
     // 编辑用户
     handleUserEdit (row) {
       this.editDialogVisible = true
-      const { username, email, mobile } = row
-      this.editUserForm = { id: row.id, username, email, mobile }
+      this.editUserForm = JSON.parse(JSON.stringify(row))
+      // const { username, email, mobile } = row
+      // this.editUserForm = { id: row.id, username, email, mobile }
     },
     // 确认编辑用户
-    handleUserEditSave (id) {
+    handleUserEditSave () {
       this.$refs.editUserFormRef.validate(async flag => {
+        const { email, mobile, id } = this.editUserForm
         if (flag) {
-          const { data: res } = await this.$axios.put(`users/${id}`, {
-            email: this.editUserForm.email,
-            mobile: this.editUserForm.mobile
-          })
-          console.log(res)
+          const { data: res } = await this.$axios.put(`users/${id}`, { email, mobile })
           if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
-          this.$message.success(res.meta.msg)
           this.editDialogVisible = false
+          this.$message.success(res.meta.msg)
           this.getUsersList()
         }
+      })
+    },
+    // 删除用户
+    handleUserDelete (id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        console.log(id)
+        // 点击了确认
+        const { data: res } = await this.$axios.delete('users/' + id)
+        console.log(res)
+        if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+        this.$message.success(res.meta.msg)
+        this.getUsersList()
+      }).catch(() => {
+        // this.$message.error('err')
       })
     }
   }
