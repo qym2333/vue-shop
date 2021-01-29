@@ -149,7 +149,7 @@ export default {
   }
   .el-container {
     .el-aside {
-      // background-color: #0e8bff;
+      transition: all 0.5s;
       .btn-collapse {
         background-color: #0e8bff;
         text-align: center;
