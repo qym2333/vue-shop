@@ -26,6 +26,7 @@ body {
     overflow-x: hidden;
 }
 
+
 #app {
     display: flex;
     border-radius: 10px;
