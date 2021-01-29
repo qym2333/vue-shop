@@ -27,6 +27,7 @@
           </div>
         </el-menu>
       </el-aside>
+      <div class="misk"></div>
       <el-main>
         <router-view></router-view>
       </el-main>
@@ -41,7 +42,8 @@ export default {
       menuList: [],
       iconList: {},
       isCollapse: false,
-      activeIndex: ''
+      activeIndex: '',
+      show: false
     }
   },
 
@@ -168,4 +170,32 @@ export default {
     // }
   }
 }
+// @media screen and (max-width: 600px) {
+//   .el-container {
+//     .el-aside {
+//       // width: 64px !important;
+//       position: fixed;
+//       left: 0;
+//       z-index: 9;
+//       transform: translateX(-100%);
+//       opacity: 0;
+//       width: 60%;
+//       max-width: 240px;
+//       transition: all 0.3s;
+//       &.show {
+//         opacity: 1;
+//         transform: translateX(0);
+//       }
+//       &.show + .misk {
+//         display: block;
+//       }
+//     }
+//     .btn {
+//       display: block;
+//     }
+//   }
+//   .logo2 {
+//     display: block;
+//   }
+// }
 </style>
