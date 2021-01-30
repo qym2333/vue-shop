@@ -5,7 +5,7 @@
         <img class="logo1" src="../assets/login-1.png" alt="" :style="isCollapse?'display:none':'display:block'">
         <img class="logo2" src="../assets/login-2.png" alt="" :style="isCollapse?'display:block':'display:none'">
       </div>
-      <span>Houtaiguanlixitong</span>
+      <span>SheiNianSheiShiZhuHouTaiGuanLi</span>
       <!-- <img src="../assets/head.gif" alt="" style="transform:scale(0.6)"> -->
       <el-button plain @click="onLogout" size="small" class="btn-quit"><i class="el-icon-switch-button"></i></el-button>
     </el-header>
