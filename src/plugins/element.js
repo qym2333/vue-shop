@@ -26,7 +26,9 @@ import {
   Pagination,
   Dialog,
   Tag,
-  Tree
+  Tree,
+  Select,
+  Option
 } from 'element-ui'
 
 Vue.use(Button)
@@ -54,6 +56,8 @@ Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Tag)
 Vue.use(Tree)
+Vue.use(Select)
+Vue.use(Option)
 // 全局消息提示
 // 挂载到vue原型，目的是所用过的组件都可以使用，因为所有的组件继承自vue的原型
 Vue.prototype.$message = Message

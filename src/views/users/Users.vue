@@ -43,7 +43,7 @@
               <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUserDelete(scope.row.id)"></el-button>
               <!-- 分配角色按钮 -->
               <el-tooltip class="item" effect="light" content="分配角色" placement="top" :enterable="false">
-                <el-button type="warning" size="mini" icon="el-icon-setting" @click="handleUserRoles(scope.row)"></el-button>
+                <el-button type="warning" size="mini" icon="el-icon-setting" @click="showAssignUserRolesDialog(scope.row)"></el-button>
               </el-tooltip>
             </div>
           </template>
@@ -90,6 +90,33 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="editDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="handleUserEditSave">确 定</el-button>
+        </span>
+      </el-dialog>
+      <el-dialog :title="`${currentUserInfo.username} 角色`" :visible.sync="assignRoleDialogVisible" width="30%" class="assign-role-box" @close="closeAssignRoleDialog">
+        <el-row>
+          <el-col :span="6">用户名称：</el-col>
+          <el-col :span="18">{{currentUserInfo.username}}</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">当前角色：</el-col>
+          <el-col :span="18">
+            <el-tag type="success">{{currentUserInfo.role_name}}</el-tag>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">新角色：</el-col>
+          <el-col :span="18">
+            <template>
+              <el-select v-model="roleId" placeholder="请选择">
+                <el-option v-for="item in rolesList" :key="item.id" :label="item.roleName" :value="item.id">
+                </el-option>
+              </el-select>
+            </template>
+          </el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="assignRoleDialogVisible = false" size="mini">取 消</el-button>
+          <el-button type="primary" @click="assignRoleSubmit" size=" mini">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -159,7 +186,12 @@ export default {
         username: '',
         email: '',
         mobile: ''
-      }
+      },
+      // 分配用户角色
+      assignRoleDialogVisible: false,
+      currentUserInfo: {}, // 当前用户信息
+      rolesList: [],
+      roleId: ''
     }
   },
 
@@ -187,10 +219,6 @@ export default {
     handleCurrentChange (val) {
       this.queryData.pagenum = val
       this.getUsersList()
-    },
-    // 分配用户角色
-    handleUserRoles (row) {
-      console.log(row)
     },
     // 修改用户状态
     async handleUserStateChange (row) {
@@ -251,10 +279,40 @@ export default {
         this.$message.success(res.meta.msg)
         this.getUsersList()
       }).catch(err => err)
+    },
+    // 打开分配角色对话框
+    async showAssignUserRolesDialog (userInfo) {
+      this.assignRoleDialogVisible = true
+      this.currentUserInfo = userInfo
+      // 获取角色列表
+      const { data: res } = await this.$axios.get('roles')
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.rolesList = res.data
+    },
+    // 关闭分配角色对话框
+    closeAssignRoleDialog () {
+      this.roleId = null
+      this.assignRoleDialogVisible = false
+    },
+    // 确定分配角色
+    async assignRoleSubmit () {
+      const uid = this.currentUserInfo.id
+      const { data: res } = await this.$axios.put(`users/${uid}/role/`, {
+        rid: this.roleId
+      })
+      res.meta.status !== 200 ? this.$message.error(res.meta.msg) : this.$message.success(res.meta.msg)
+
+      this.getUsersList()
+      this.assignRoleDialogVisible = false
     }
   }
 }
 </script>
 
 <style scoped lang='less'>
+.assign-role-box {
+  .el-row {
+    padding: 10px;
+  }
+}
 </style>
