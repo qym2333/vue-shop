@@ -3,10 +3,9 @@ import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
 import './assets/global.css'
-// 引入axios
+import ZkTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
 Vue.prototype.$axios = axios
-
 // axios配置
 axios.defaults.baseURL = 'http://115.159.87.220:8888/api/private/v1/'
 // axios 拦截器 添加Auth字段发送token
@@ -15,6 +14,7 @@ axios.interceptors.request.use(config => {
   return config
 })
 
+Vue.component('tree-grid', ZkTable)
 Vue.config.productionTip = false
 
 new Vue({
