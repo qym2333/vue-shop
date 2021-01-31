@@ -244,7 +244,6 @@ export default {
         type: 'warning'
       }).then(async () => {
         const { data: res } = await this.$axios.delete(`roles/${roleId}`)
-        console.log(res)
         if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
         this.$message({
           type: 'success',
