@@ -43,7 +43,7 @@
               <!-- 编辑按钮 -->
               <el-button type="primary" size="mini" icon="el-icon-edit" @click="showRoleDialog(scope.row)"></el-button>
               <!-- 删除按钮 -->
-              <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
+              <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleteRole(scope.row)"></el-button>
               <!-- 分配权限按钮 -->
               <el-tooltip class="item" effect="light" content="分配权限" placement="top" :enterable="false">
                 <el-button type="warning" size="mini" icon="el-icon-setting" @click="showRightsDialog(scope.row)"></el-button>
@@ -234,6 +234,24 @@ export default {
           return false
         }
       })
+    },
+    // 删除角色
+    handleDeleteRole (row) {
+      const roleId = row.id // 当前角色id
+      this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const { data: res } = await this.$axios.delete(`roles/${roleId}`)
+        console.log(res)
+        if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        this.getRolesList()
+      }).catch(err => err)
     }
   }
 }
