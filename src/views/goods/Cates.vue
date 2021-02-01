@@ -125,7 +125,7 @@ export default {
 
   methods: {
     async getCateList () {
-      const { data: res } = await this.$axios.get('/categories', {
+      const { data: res } = await this.$axios.get('categories', {
         params: this.queryData
       })
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
