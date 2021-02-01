@@ -3,8 +3,10 @@ import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
 import './assets/global.css'
+import 'element-ui/lib/theme-chalk/base.css'
 import ZkTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
+
 Vue.prototype.$axios = axios
 // axios配置
 axios.defaults.baseURL = 'http://115.159.87.220:8888/api/private/v1/'

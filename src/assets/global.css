@@ -50,3 +50,17 @@ body {
 .el-cascader-menu {
     height: 240px;
 }
+
+.fade-enter,
+.fade-leave-active {
+    opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.el-dialog {
+    min-width: 320px;
+}

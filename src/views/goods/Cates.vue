@@ -59,13 +59,19 @@
         <el-button type="primary" @click="editCateSubmit">确 定</el-button>
       </span>
     </el-dialog>
+    <transition name="fade">
+      <loading v-if="isLoading"></loading>
+    </transition>
   </div>
 </template>
 
 <script>
+import Loading from '@/components/Loading'
 export default {
+  components: { Loading },
   data () {
     return {
+      isLoading: false,
       cateList: [], // 商品分类列表
       queryData: {
         type: [], // 获得某级分类列表

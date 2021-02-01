@@ -125,6 +125,7 @@ export default {
 <style lang='less'>
 .login-box {
   background-color: #2e9dc9;
+  // background: url('../assets/cloud.svg') center center;
   width: 100%;
   height: 100%;
   img.change {
