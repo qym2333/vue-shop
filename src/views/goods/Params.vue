@@ -28,9 +28,9 @@
               <template slot-scope="scope">
                 <el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable>{{item}}</el-tag>
 
-                <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+                <el-input class="input-new-tag" clearable v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)">
                 </el-input>
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ 新参数</el-button>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ 新参数</el-button>
 
               </template>
             </el-table-column>
@@ -99,21 +99,21 @@
         <el-button type="primary" @click="handleEditSubmit">确 定</el-button>
       </span>
     </el-dialog>
-    <transition name="fade">
+    <!-- <transition name="fade">
       <loading v-if="isLoading"></loading>
-    </transition>
+    </transition> -->
 
   </div>
 </template>
 
 <script>
-import Loading from '@/components/Loading'
+// import Loading from '@/components/Loading'
 
 export default {
-  components: { Loading },
+  // components: { Loading },
   data () {
     return {
-      isLoading: false,
+      // isLoading: false,
       cateList: [],
       // 级联选择器
       cascaderValue: [],
@@ -150,8 +150,7 @@ export default {
             required: true, message: '请输入名称', trigger: 'blur'
           }
         ]
-      },
-      inputVisible: false
+      }
     }
   },
 
@@ -185,7 +184,7 @@ export default {
         this.cascaderValue = []
         return
       }
-      this.isLoading = true
+      // this.isLoading = true
       const { data: res } = await this.$axios.get(`categories/${this.cateId}/attributes`, {
         params: {
           sel: this.activeName
@@ -194,9 +193,11 @@ export default {
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       res.data.forEach(element => {
         element.attr_vals = element.attr_vals === '' ? [] : element.attr_vals.split(' ')
+        element.inputVisible = false
+        element.inputValue = ''
       })
       this.activeName === 'many' ? this.manyTableData = res.data : this.onlyTableData = res.data
-      this.isLoading = false
+      // this.isLoading = false
     },
     cascaderChange () {
       this.getParms()
@@ -260,12 +261,29 @@ export default {
       }).catch(err => err)
     },
     // 添加参数属性输入框失去焦点或回车
-    handleInputConfirm () {
-      this.inputVisible = false
+    async handleInputConfirm (row) {
+      row.inputVisible = true
+      if (!row.inputValue.trim()) {
+        row.inputVisible = false
+        row.inputValue = ''
+        return
+      }
+      row.attr_vals.push(row.inputValue.trim())
+      row.inputValue = ''
+      const { data: res } = await this.$axios.put(`categories/${this.cateId}/attributes/${row.attr_id}`, {
+        attr_name: row.attr_name,
+        attr_sel: row.attr_sel,
+        attr_vals: row.attr_vals.join(' ')
+      })
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.$message.success(res.meta.msg)
     },
     // 添加新参数点击事件
-    showInput () {
-      this.inputVisible = true
+    showInput (row) {
+      row.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
     }
   }
 }

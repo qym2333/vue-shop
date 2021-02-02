@@ -1,4 +1,10 @@
 import Vue from 'vue'
+// fade/zoom 等
+// import '../assets/theme/index.css'
+import 'element-ui/lib/theme-chalk/base.css'
+// collapse 展开折叠
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition'
+
 import {
   Button,
   Form,
@@ -67,6 +73,7 @@ Vue.use(Alert)
 Vue.use(Tabs)
 Vue.use(TabPane)
 
+Vue.component(CollapseTransition.name, CollapseTransition)
 // 全局消息提示
 // 挂载到vue原型，目的是所用过的组件都可以使用，因为所有的组件继承自vue的原型
 Vue.prototype.$message = Message
