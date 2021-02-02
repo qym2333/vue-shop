@@ -111,7 +111,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     // background-color: #0e8bff;
-    border-bottom: 2px solid #0e8bff;
+    // border-bottom: 2px solid #0e8bff;
+    box-shadow: 0 2px 10px #e6e6e6;
+    z-index: 10;
     .btn-quit {
       i {
         font-size: 20px;

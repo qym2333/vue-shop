@@ -26,9 +26,9 @@
           <el-table :data="manyTableData" style="width: 100%">
             <el-table-column type="expand">
               <template slot-scope="scope">
-                <el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable>{{item}}</el-tag>
+                <el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable @close="handleDeleteAttr(index,scope.row)">{{item}}</el-tag>
 
-                <el-input class="input-new-tag" clearable v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)">
+                <el-input class="input-new-tag" clearable v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="$event.target.blur" @blur="handleInputConfirm(scope.row)">
                 </el-input>
                 <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ 新参数</el-button>
 
@@ -53,7 +53,14 @@
           <el-button :type="isBtnDisabled ? 'info' :'primary'" size="mini" :disabled="isBtnDisabled" @click="addParamsDialogVisible=true">添加属性</el-button>
           <el-table :data="onlyTableData" style="width: 100%">
             <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable @close="handleDeleteAttr(index,scope.row)">{{item}}</el-tag>
 
+                <el-input class="input-new-tag" clearable v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="$event.target.blur" @blur="handleInputConfirm(scope.row)">
+                </el-input>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ 新参数</el-button>
+
+              </template>
             </el-table-column>
             <el-table-column type="index"></el-table-column>
             <el-table-column prop="attr_name" label="分类名称">
@@ -182,6 +189,8 @@ export default {
     async getParms () {
       if (this.cascaderValue.length !== 3) {
         this.cascaderValue = []
+        this.manyTableData = []
+        this.onlyTableData = []
         return
       }
       // this.isLoading = true
@@ -260,9 +269,8 @@ export default {
         this.getParms()
       }).catch(err => err)
     },
-    // 添加参数属性输入框失去焦点或回车
-    async handleInputConfirm (row) {
-      row.inputVisible = true
+    // 添加参数属性，输入框失去焦点或回车
+    handleInputConfirm (row) {
       if (!row.inputValue.trim()) {
         row.inputVisible = false
         row.inputValue = ''
@@ -270,13 +278,7 @@ export default {
       }
       row.attr_vals.push(row.inputValue.trim())
       row.inputValue = ''
-      const { data: res } = await this.$axios.put(`categories/${this.cateId}/attributes/${row.attr_id}`, {
-        attr_name: row.attr_name,
-        attr_sel: row.attr_sel,
-        attr_vals: row.attr_vals.join(' ')
-      })
-      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
-      this.$message.success(res.meta.msg)
+      this.saveAttr(row)
     },
     // 添加新参数点击事件
     showInput (row) {
@@ -284,6 +286,21 @@ export default {
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus()
       })
+    },
+    // 删除参数，点击标签关闭图标
+    handleDeleteAttr (index, row) {
+      row.attr_vals.splice(index, 1)
+      this.saveAttr(row)
+    },
+    // 保存参数操作，提交请求
+    async saveAttr (row) {
+      const { data: res } = await this.$axios.put(`categories/${this.cateId}/attributes/${row.attr_id}`, {
+        attr_name: row.attr_name,
+        attr_sel: row.attr_sel,
+        attr_vals: row.attr_vals.join(' ')
+      })
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.$message.success(res.meta.msg)
     }
   }
 }
