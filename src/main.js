@@ -37,6 +37,13 @@ axios.interceptors.response.use(
   }
 )
 Vue.component('tree-grid', ZkTable)
+Vue.filter('dateFormat', val => {
+  const date = new Date(val * 1000)
+  const y = date.getFullYear()
+  const m = (date.getMonth() + 1).toString().padStart(2, '0')
+  const d = date.getDate().toString().padStart(2, '0')
+  return y + '-' + m + '-' + d
+})
 Vue.config.productionTip = false
 
 new Vue({
