@@ -68,3 +68,15 @@ body {
 #nprogress .bar {
     background: #0e8bff !important;
 }
+
+.box-card {
+    min-width: 600px;
+}
+
+.el-step__title {
+    font-size: 12px;
+}
+
+.ql-editor {
+    min-height: 300px;
+}

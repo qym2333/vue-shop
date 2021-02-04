@@ -8,6 +8,7 @@ import ZkTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+import './plugins/vueQuillEditor'
 
 Vue.prototype.$axios = axios
 

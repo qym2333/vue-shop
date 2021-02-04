@@ -115,8 +115,18 @@ export default {
     box-shadow: 0 2px 10px #e6e6e6;
     z-index: 10;
     .btn-quit {
+      background: url('../assets/login-0.png') center center no-repeat;
+      background-position: 3px 28px;
+      background-size: contain;
+      transition: all 0.3s;
       i {
         font-size: 20px;
+      }
+      &:hover {
+        background-position-y: 15px;
+        i {
+          color: transparent;
+        }
       }
     }
     span {
